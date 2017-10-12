@@ -1,67 +1,75 @@
-#define DACout A21 // DAC pins are A21 and A22
+#include "Waveform.h"
 
-float Fs = 5000; // frequency of interrupt
-float t = 0;
+#define PI 3.141592
 
-int ledPin = 13;
+#define ledPin 13
+#define outPin A21		// DAC pins are A21 and A22
+#define INT_FREQ 100.0
 
-volatile unsigned int level = 0; // use volatile for shared variables
-volatile unsigned long time = 0;
+float interrupt_callback_time = (1 / INT_FREQ) * 1000000; // microseconds
+
+
+// use volatile for shared variables
+volatile unsigned int step = 0; // increment on interrupts
+volatile float debug;
 
 // Objects
 IntervalTimer myTimer; // init Teensy timer
-Waveform wavePattern;
+Waveform wave;
 
 void setup() {
-
   analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
 
   pinMode(ledPin, OUTPUT);
-  pinMode(DACout, OUTPUT);
+  pinMode(outPin, OUTPUT);
 
+  wave.init();
+  
   Serial.begin(115200);
   Serial.println("serial on");
-
-  wavePattern.init();
-  wavePattern.compute();
-  wavePattern.graph();
-
-  int interrupt_callback_time = (1 / Fs) * 1000000; // microseconds
-  myTimer.begin(play_level, (int)interrupt_callback_time);
+  
+  myTimer.begin(play_level, (int) interrupt_callback_time);
 }
 
 // play value on analog out pin
 void play_level(void) {
-  time = millis();
-  
+  float time = step * (float)(interrupt_callback_time / 1000000);
+  debug = wave.calcUpdate(time);
+  step++;
 }
 
 void loop() {
-  unsigned long debug;
+
+  /* float test = 1.0 /90.0; */
+  /* Serial.println(test); */
+  
+  float debugCopy;
 
   // to read a variable which the interrupt code writes, we
   // must temporarily disable interrupts, to be sure it will
   // not change while we are reading.  To minimize the time
   // with interrupts off, just quickly make a copy, and then
   // use the copy while allowing the interrupt to keep working.
+
   noInterrupts();
-  debug = time;
+  debugCopy = debug;
   interrupts();
-  /* Serial.println(debug); */
-  
-  delay(100);
+
+  Serial.println(debugCopy, 5);
 }
 
 
-// based of step/ramp waveform in Culbertson et al (2016)
-/* int t1 = 0; */
-/* int t2 = 0; */
-/* void culbert_wave(void) { */
-/*   if (t <= t1) { */
-/*     level = max_level; */
-/*   } else if (t <= t2) { */
-/*     level = max_level - (2 / (t2 - t1)) * (t - t1); */
-/*   } else { */
-/*     level = 0; */
-/*   } */
-/* } */
+float waveSine(float wavept) {
+  return 1 * sin( 2 * 3.141592 * 40 * wavept + 0 );  
+}
+
+float waveKlatzky(float wavept) {
+  long delta = -0.5;
+  float omega1 = PI + PI/2 * delta;
+
+  if (wavept < omega1) return -cos(wavept * PI/omega1);
+  else {
+    float omega2 = PI - PI/2 * (1 - delta);
+    return -cos(wavept * PI/omega2);
+  }
+}

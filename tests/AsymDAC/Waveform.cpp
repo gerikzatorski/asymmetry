@@ -1,30 +1,28 @@
 #include "Waveform.h"
+#include <math.h>
 
-Waveform::Waveform(int pin) {
-  _pin = OUTPIN;
+#define PI 3.141592
+
+Waveform::Waveform(void) {
 }
 
-Waveform::init(void) {
-  pinMode(_pin, OUTPUT);
-  
+void Waveform::init(void) {
   _A = 1;
-  _f = 40;
+  _f = 1 / 2 * PI;
   _T = 1 / _f;
   _phase_offset = 0;
 }
 
-Waveform::compute(void) {
-  
-  double step = _T / N_SAMPLES;
-
-  for (int i = 0; i < N_SAMPLES; ++i) {
-    samples[i] = A * sin( 2 * PI * _f * i * step + _phase_offset );
+// create lookup table
+void Waveform::compute(void) {
+  for (int i = 0; i < N_UPDATES; i++) {
+    updates[i] = (float) 1 * sin( 2 * PI * 1 * t + 0 );
   }
 }
 
-Waveform::graph(void) {
-  for (int i = 0; i < N_SAMPLES; ++i) {
-    Serial.println(samples[i]);
-    delay(5);
-  }
+float Waveform::calcUpdate(float t) {
+  return (float) 1 * sin( 2 * PI * 1 * t + 0 );
+}
+
+void Waveform::graph(void) {
 }

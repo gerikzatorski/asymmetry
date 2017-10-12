@@ -1,37 +1,32 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define PI 3.141592
-#define N_SAMPLES 1000
-#define OUTPIN 9
+#define N_UPDATES 1000
 
 /* 
-/* Assuming amplitude of 1
-/* 
+ * Assuming amplitude of 1
+ * 
 */
 
 // can still make subclasses
-namespace Waves {
-  class Waveform {
+class Waveform
+{
+ public:
+  Waveform(void);
+  void init(void);
+  void compute(void);
+  float calcUpdate(float);
+  void graph(void);
 
-  /* public: */
-    Waveform::Waveform(int);
-    Waveform::init(void);
-    Waveform::compute(void);
-    Waveform::graph(void);
+ private:
+  int _pin;
+  float updates[N_UPDATES];
+  int _A;			// Amplitude
+  int _f;			// Wave pattern frequency (Hz)
+  int _T;			// period (s)
+  int _phase_offset;		// phase offset (deg with 360 max)
+  int _sampling_rate;		// sampling rate of signals
+};
 
-  private:
-    int _pin;
-    
-    double samples[N_SAMPLES];
-
-    // Wave Characteristics
-    int _A;			// Amplitude
-    int _f;			// Wave pattern frequency (Hz)
-    int _T;			// period (s)
-    int _phase_offset;		// phase offset (deg with 360 max)
-  };
-
-}; // Waves namespace
 
 #endif // _WAVEFORM_H
