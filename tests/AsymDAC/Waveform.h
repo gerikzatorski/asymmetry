@@ -12,7 +12,6 @@ class Waveform
   void compute(void);
   double calcUpdate(double);
   void graph(void);
-  void print(void);
 
   int getAmplitude(void);
   int getFrequency(void);
