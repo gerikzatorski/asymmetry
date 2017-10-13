@@ -3,29 +3,32 @@
 
 #define N_UPDATES 1000
 
-/* 
- * Assuming amplitude of 1
- * 
-*/
-
 // can still make subclasses
 class Waveform
 {
  public:
   Waveform(void);
-  void init(void);
+  void init(int f);
   void compute(void);
-  float calcUpdate(float);
+  double calcUpdate(double);
   void graph(void);
+  void print(void);
 
+  int getAmplitude(void);
+  int getFrequency(void);
+  double getPeriod(void);
+  double getOffset(void);
+  
  private:
   int _pin;
-  float updates[N_UPDATES];
   int _A;			// Amplitude
   int _f;			// Wave pattern frequency (Hz)
-  int _T;			// period (s)
-  int _phase_offset;		// phase offset (deg with 360 max)
-  int _sampling_rate;		// sampling rate of signals
+  double _T;			// period (s)
+  double _phase_offset;		// phase offset (deg with 360 max)
+
+  int _update_rate;		// sampling rate of signals
+  double updates[N_UPDATES];	// for precalculating lookup table
+
 };
 
 

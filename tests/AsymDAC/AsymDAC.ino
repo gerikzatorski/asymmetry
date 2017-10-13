@@ -1,13 +1,11 @@
 #include "Waveform.h"
 
-#define PI 3.141592
-
 #define ledPin 13
 #define outPin A21		// DAC pins are A21 and A22
-#define INT_FREQ 100.0
+#define INT_FREQ 10000.0
+// PI is defined in Wire
 
-float interrupt_callback_time = (1 / INT_FREQ) * 1000000; // microseconds
-
+float interrupt_callback_time = (1 / INT_FREQ);
 
 // use volatile for shared variables
 volatile unsigned int step = 0; // increment on interrupts
@@ -23,26 +21,26 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init();
+  wave.init(40);
   
   Serial.begin(115200);
   Serial.println("serial on");
   
-  myTimer.begin(play_level, (int) interrupt_callback_time);
+  myTimer.begin(play_level, (int) interrupt_callback_time * 1000000);
 }
 
 // play value on analog out pin
-void play_level(void) {
-  float time = step * (float)(interrupt_callback_time / 1000000);
+void play_level(void) { 
+  float time = step * (float)(interrupt_callback_time);
+  if (time > wave.getPeriod()) {
+    time = time - wave.getPeriod();
+  }
   debug = wave.calcUpdate(time);
   step++;
 }
 
 void loop() {
 
-  /* float test = 1.0 /90.0; */
-  /* Serial.println(test); */
-  
   float debugCopy;
 
   // to read a variable which the interrupt code writes, we
@@ -50,7 +48,6 @@ void loop() {
   // not change while we are reading.  To minimize the time
   // with interrupts off, just quickly make a copy, and then
   // use the copy while allowing the interrupt to keep working.
-
   noInterrupts();
   debugCopy = debug;
   interrupts();
