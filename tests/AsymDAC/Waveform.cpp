@@ -1,8 +1,8 @@
 /**
-    Class that represents a waveform pattern.
+   Class that represents a waveform pattern.
 
-    @author Gerik Zatorski
-    @version 0.0
+   @author Gerik Zatorski
+   @version 0.0
 */
 
 #include "matplotlibcpp.h"
@@ -14,33 +14,31 @@
 namespace plt = matplotlibcpp;
 using namespace std;
 
-/** Waveform constructor */
+namespace asymmetry {
+
+// ######################################################################
+// # Waveform Class
+// ######################################################################
+
 Waveform::Waveform(void) {
 }
 
-/** 
-    Initializes Waveform objects.
-    @param f Wave frequency
-*/
 void Waveform::init(int f) {
   _A = 1;
   _f = f;
-  _T = 1 / _f;
-  _phase_offset = 0;
+  _T = 1.0 / _f;
+  _phase_offset = 0.0;
+
+  _update_rate = (double) _T / N_UPDATES;
 }
 
-/** Create lookup table */
 void Waveform::compute(void) {
   for (int i = 0; i < N_UPDATES; i++) {
-    updates[i] = (float) 1 * sin( 2 * PI * _f * i * _update_rate + 0 );
+    _updates[i] = (double) 4.0;
+    _times[i] = (double) i * _update_rate;
   }
 }
 
-/** 
-    Calculate update values dynamically
-    @param t The time to evaluate waveform at
-    @return The waveform update value at time t
-*/
 double Waveform::calcUpdate(double t) {
   if (t > _T) {
     throw "t is outside domain of waveform function.";
@@ -55,15 +53,18 @@ double Waveform::calcUpdate(double t) {
   float wavePct = t / _T; // need "modulus" of float
 }
 
-// Graphs a single Waveform.
 void Waveform::graph(void) {
   double n = (double)N_UPDATES;
   vector<double> x(n),y(n); 
 
+  using namespace std;
+  
   for(int i=0; i<n; ++i) {
     double t = i/n;
-    x.at(i) = t;
-    y.at(i) = calcUpdate(t);
+    x.at(i) = _times[i];
+    y.at(i) = _updates[i];
+    cout << "DEBUG : " << i << endl;
+    
   }
   
   plt::plot(x, y, "r-");
@@ -71,7 +72,46 @@ void Waveform::graph(void) {
   
 }
 
-double Waveform::getPeriod(void) { return _T; }
 int Waveform::getAmplitude(void) { return _A; }
 int Waveform::getFrequency(void) { return _f; }
+double Waveform::getPeriod(void) { return _T; }
 double Waveform::getOffset(void) { return _phase_offset; }
+
+
+// ######################################################################
+// # Sinewave Class
+// ######################################################################
+
+/** Constructor */
+Sinewave::Sinewave(void) {
+}
+
+/** Destructor */
+Sinewave::~Sinewave(void) {
+}
+
+void Sinewave::compute(void) {
+  using namespace std;
+  for (int i = 0; i < N_UPDATES; i++) {
+    _updates[i] = (double) 1 * sin( 2 * PI * _f * i * _update_rate + 0 );
+    _times[i] = (double) i * _update_rate;
+  }
+}
+
+// ######################################################################
+// # ASinewave Class
+// ######################################################################
+
+ASinewave::ASinewave(void) {
+}
+
+ASinewave::~ASinewave(void) {
+}
+
+void ASinewave::compute(void) {
+  for (int i = 0; i < N_UPDATES; i++) {
+    _updates[i] = (double) 1 * sin( 2 * PI * _f * i * _update_rate + 0 );
+  }
+}
+
+} // namespace asymmetry
