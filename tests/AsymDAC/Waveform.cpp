@@ -10,6 +10,7 @@
 #include <iostream>
 
 #define PI 3.141592
+#define E 2.71828182845904523536
 
 namespace plt = matplotlibcpp;
 using namespace std;
@@ -28,15 +29,16 @@ void Waveform::init(int f) {
   _f = f;
   _T = 1.0 / _f;
   _phase_offset = 0.0;
-
   _update_rate = (double) _T / N_UPDATES;
+
+  for (int i = 0; i < N_UPDATES; i++) {
+    _times[i] = (double) i * _update_rate;
+  }
+
 }
 
 void Waveform::compute(void) {
-  for (int i = 0; i < N_UPDATES; i++) {
-    _updates[i] = (double) 4.0;
-    _times[i] = (double) i * _update_rate;
-  }
+  throw "Calling compute on Waveform parent class";
 }
 
 double Waveform::calcUpdate(double t) {
@@ -44,13 +46,8 @@ double Waveform::calcUpdate(double t) {
     throw "t is outside domain of waveform function.";
   }
   
-  // basic sine wave
+  // basic sine wave by default
   return (double) 1 * sin( 2 * PI * _f * t + 0 );
-
-  // klatzky wave
-  long delta = -0.5;
-  float omega1 = PI + PI/2 * delta;
-  float wavePct = t / _T; // need "modulus" of float
 }
 
 void Waveform::graph(void) {
@@ -63,8 +60,6 @@ void Waveform::graph(void) {
     double t = i/n;
     x.at(i) = _times[i];
     y.at(i) = _updates[i];
-    cout << "DEBUG : " << i << endl;
-    
   }
   
   plt::plot(x, y, "r-");
@@ -94,7 +89,6 @@ void Sinewave::compute(void) {
   using namespace std;
   for (int i = 0; i < N_UPDATES; i++) {
     _updates[i] = (double) 1 * sin( 2 * PI * _f * i * _update_rate + 0 );
-    _times[i] = (double) i * _update_rate;
   }
 }
 
@@ -109,9 +103,32 @@ ASinewave::~ASinewave(void) {
 }
 
 void ASinewave::compute(void) {
-  for (int i = 0; i < N_UPDATES; i++) {
-    _updates[i] = (double) 1 * sin( 2 * PI * _f * i * _update_rate + 0 );
+
+  // option 1:
+  // double x = 0;
+  // for (int i = 0; i < N_UPDATES; ++i) {
+  //   x = (double) i / N_UPDATES * 2 * PI;
+  //   cout << x << endl;
+  //   _updates[i] = cos( x + pow(sin( x / 2 ),2) );
+  // }
+
+  // option 2
+  // double x = 0;
+  // for (int i = 0; i < N_UPDATES; ++i) {
+  //   x = (double) i / N_UPDATES * PI;
+  //   cout << x << endl;
+  //   _updates[i] = 2 * pow(cos( x ),2) * pow(E,sin(2*x)) / 1.7866 - 1;
+  // }
+
+  // option 3 : pure skew
+  double x = 0;
+  double K = 0.5;
+  for (int i = 0; i < N_UPDATES; ++i) {
+    x = (double) i / N_UPDATES * 2 * PI;
+    cout << x << endl;
+    _updates[i] = sin( x + K * sin(x));
   }
+
 }
 
 } // namespace asymmetry
