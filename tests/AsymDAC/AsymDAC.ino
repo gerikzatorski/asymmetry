@@ -2,18 +2,17 @@
 
 #define ledPin 13
 #define outPin A21		// DAC pins are A21 and A22
-#define INT_FREQ 10000.0
-// PI is defined in Wire
+#define INT_FREQ 40
 
-float interrupt_callback_time = (1 / INT_FREQ);
+double interrupt_callback_time = (double) (1 / INT_FREQ);
 
 // use volatile for shared variables
 volatile unsigned int step = 0; // increment on interrupts
-volatile float debug;
+volatile double debug;
 
 // Objects
 IntervalTimer myTimer; // init Teensy timer
-Waveform wave;
+asymmetry::ASinewave wave;
 
 void setup() {
   analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
@@ -22,6 +21,7 @@ void setup() {
   pinMode(outPin, OUTPUT);
 
   wave.init(40);
+  wave.compute();
   
   Serial.begin(115200);
   Serial.println("serial on");
@@ -31,17 +31,23 @@ void setup() {
 
 // play value on analog out pin
 void play_level(void) { 
-  float time = step * (float)(interrupt_callback_time);
-  if (time > wave.getPeriod()) {
-    time = time - wave.getPeriod();
+  /* double time = step * (double)(interrupt_callback_time); */
+  /* if (time > wave.getPeriod()) { */
+  /*   time = time - wave.getPeriod(); */
+  /* } */
+
+  if (step >= 1000) {
+    step = 0;
   }
-  debug = wave.calcUpdate(time);
+  double val = wave.getUpdate(step);
+  analogWrite(outPin, val);
+  Serial.println("testing good");
   step++;
 }
 
 void loop() {
 
-  float debugCopy;
+  double debugCopy;
 
   // to read a variable which the interrupt code writes, we
   // must temporarily disable interrupts, to be sure it will
@@ -52,21 +58,16 @@ void loop() {
   debugCopy = debug;
   interrupts();
 
-  Serial.println(debugCopy, 5);
+  /* Serial.println(debugCopy, 5); */
 }
 
-
-float waveSine(float wavept) {
-  return 1 * sin( 2 * 3.141592 * 40 * wavept + 0 );  
-}
-
-float waveKlatzky(float wavept) {
+double waveKlatzky(double wavept) {
   long delta = -0.5;
-  float omega1 = PI + PI/2 * delta;
+  double omega1 = PI + PI/2 * delta;
 
   if (wavept < omega1) return -cos(wavept * PI/omega1);
   else {
-    float omega2 = PI - PI/2 * (1 - delta);
+    double omega2 = PI - PI/2 * (1 - delta);
     return -cos(wavept * PI/omega2);
   }
 }

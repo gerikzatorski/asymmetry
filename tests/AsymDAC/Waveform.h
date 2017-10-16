@@ -1,7 +1,7 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define N_UPDATES 1000
+#define N_UPDATES 10
 
 // can still make subclasses
 namespace asymmetry {
@@ -9,29 +9,44 @@ namespace asymmetry {
   class Waveform
   {
   public:
-    // @brief Constructor
+    // Constructor
     Waveform(void);
     
-    // @brief Initializes Waveform objects.
+    // Initializes Waveform objects.
     // @param f Wave frequency
     void init(int f);
 
-    // @brief Create lookup table
+    // Compute lookup tables for signal values and times
     void compute(void);
 
     // Calculate update values dynamically
-    // @param t The time to evaluate waveform at
     // @return The waveform update value at time t
     double calcUpdate(double);
 
-    // @brief Graphs a single Waveform.
-    void graph(void);
+    // @param i iteration within N_UPDATES
+    // @return The signal value at i
+    double getUpdate(int i);
+
+    // Linear interpolate the waveform value using precomputed tables
+    // @param t The time to evaluate waveform at
+    // @return The approximate wave value at time t
+    double approx(double t);
     
+    // Graphs a single Waveform using exact lookup table values
+    void graph(void);
+
+    // Graph a waveform with 
+    void graphApprox(double f_int);
+
+    // Getters
     int getAmplitude(void);
     int getFrequency(void);
     double getPeriod(void);
     double getOffset(void);
-  
+
+    // Setters
+    void setFrequency(int f);
+    
   protected:
     int _pin;
     int _A;			// Amplitude
@@ -41,7 +56,7 @@ namespace asymmetry {
 
     double _update_rate;	// sampling rate of signals
     double _updates[N_UPDATES];	// for precalculating lookup table
-    double _times[N_UPDATES];
+    double _times[N_UPDATES];   // array of times corresponding to update values
 
   };
 
