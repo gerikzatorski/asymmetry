@@ -1,7 +1,7 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define N_UPDATES 10
+#define N_UPDATES 50
 
 // can still make subclasses
 namespace asymmetry {
@@ -18,10 +18,6 @@ namespace asymmetry {
 
     // Compute lookup tables for signal values and times
     void compute(void);
-
-    // Calculate update values dynamically
-    // @return The waveform update value at time t
-    double calcUpdate(double);
 
     // @param i iteration within N_UPDATES
     // @return The signal value at i

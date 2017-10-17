@@ -2,12 +2,13 @@
 
 #define ledPin 13
 #define outPin A21		// DAC pins are A21 and A22
-#define INT_FREQ 40
+#define INT_FREQ 1000
 
-double interrupt_callback_time = (double) (1 / INT_FREQ);
+double interrupt_callback_time = (double) (1.0 / INT_FREQ);
 
 // use volatile for shared variables
 volatile unsigned int step = 0; // increment on interrupts
+volatile double time = 0; // increment on interrupts
 volatile double debug;
 
 // Objects
@@ -20,34 +21,35 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init(40);
+  wave.init(1);
   wave.compute();
   
   Serial.begin(115200);
   Serial.println("serial on");
   
-  myTimer.begin(play_level, (int) interrupt_callback_time * 1000000);
+  myTimer.begin(play_level, (int)(interrupt_callback_time * 1000000));
 }
 
 // play value on analog out pin
 void play_level(void) { 
-  /* double time = step * (double)(interrupt_callback_time); */
-  /* if (time > wave.getPeriod()) { */
-  /*   time = time - wave.getPeriod(); */
-  /* } */
 
-  if (step >= 1000) {
-    step = 0;
+  if (time >= wave.getPeriod()) {
+    time = time - wave.getPeriod();
   }
-  double val = wave.getUpdate(step);
+
+  double val = wave.approx(time) * 2000 + 2000; // help with dc offset
+  /* double val = wave.approx(time); */
   analogWrite(outPin, val);
-  Serial.println("testing good");
-  step++;
+
+  debug = val;
+
+  time = time + interrupt_callback_time;
 }
 
 void loop() {
 
   double debugCopy;
+  double timeCopy;
 
   // to read a variable which the interrupt code writes, we
   // must temporarily disable interrupts, to be sure it will
@@ -56,9 +58,14 @@ void loop() {
   // use the copy while allowing the interrupt to keep working.
   noInterrupts();
   debugCopy = debug;
+  timeCopy = time;
   interrupts();
 
-  /* Serial.println(debugCopy, 5); */
+  Serial.print(timeCopy);
+  Serial.print("\t");
+  Serial.println(debugCopy);
+  
+  delay(5);
 }
 
 double waveKlatzky(double wavept) {
