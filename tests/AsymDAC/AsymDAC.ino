@@ -21,7 +21,7 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init(3);
+  wave.init(1);
   wave.compute();
   
   Serial.begin(115200);
@@ -37,8 +37,8 @@ void play_level(void) {
     time = time - wave.getPeriod();
   }
 
-  /* double val = wave.approx(time) * 2000 + 2000; // help with dc offset */
-  double val = wave.approx(time);
+  double val = wave.approx(time) * 2000 + 2000; // help with dc offset
+  /* double val = wave.approx(time); */
   analogWrite(outPin, val);
 
   debug = val;
