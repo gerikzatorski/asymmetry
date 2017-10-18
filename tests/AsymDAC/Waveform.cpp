@@ -1,15 +1,15 @@
-/**
-
-   Class that represents a waveform pattern.
-
-   @author Gerik Zatorski
-   @version 0.0
-*/
+// Class that represents a waveform pattern.
+// "samples" the wave function to create a lookup table.
+//
+// @author Gerik Zatorski
+// @version 0.0
+//
+// ######################################################################
 
 #include "Waveform.h"
 #include <math.h>
-#include "matplotlibcpp.h"
-#include <iostream>
+// #include "matplotlibcpp.h"
+// #include <iostream>
 
 #define PI 3.141592
 #define E 2.71828182845904523536
@@ -47,6 +47,8 @@ double Waveform::getUpdate(int i) {
 }
 
 double Waveform::approx(double t) {
+  using namespace std;
+  
   double dt = t;
 
   // ensure dt is within waveform domain
@@ -65,14 +67,13 @@ double Waveform::approx(double t) {
   int i0 = i-1;
   int i1 = i;
 
+
   if (i >= N_UPDATES) {
     i0 = i-1;
     i1 = 0;
   }
 
-  // return _updates[i0];
-  // return i0;
-  return _updates[i0] + (t - _times[i0]) * (_updates[i1] - _updates[i0]) / _update_rate;
+  return _updates[i0] + (dt - _times[i0]) * (_updates[i1] - _updates[i0]) / _update_rate;
 }
 
 void Waveform::graph(void) {
@@ -98,29 +99,29 @@ void Waveform::graph(void) {
 
 
 void Waveform::graphApprox(double f_int) {
-  namespace plt = matplotlibcpp;
-  using namespace std;
+  // namespace plt = matplotlibcpp;
+  // using namespace std;
 
-  double T_int = 1.0 / f_int;
+  // double T_int = 1.0 / f_int;
   
-  double n = (double) _T / T_int;
-  vector<double> x(n+1),y(n+1); 
+  // double n = (double) _T / T_int;
+  // vector<double> x(n+1),y(n+1); 
   
-  int i = 0;
-  double t = 0;
+  // int i = 0;
+  // double t = 0;
 
-  while (t < _T) {
-    x.at(i) = i * T_int;
-    y.at(i) = approx(t);
-    i++;
-    t = i * T_int;
-  }
+  // while (t < _T) {
+  //   x.at(i) = i * T_int;
+  //   y.at(i) = approx(t);
+  //   i++;
+  //   t = i * T_int;
+  // }
 
-  x.at(n) = _T;
-  y.at(n) = _updates[0];
+  // x.at(n) = _T;
+  // y.at(n) = _updates[0];
 
-  plt::plot(x, y, "r-");
-  plt::show();
+  // plt::plot(x, y, "r-");
+  // plt::show();
   
 }
 
@@ -208,7 +209,7 @@ ATrianglewave::~ATrianglewave(void) {
 void ATrianglewave::compute(void) {
   double x = 0;
   double m = 5;
-  double L = _T / 2;
+  double L = _T;
   for (int i = 0; i < N_UPDATES; ++i) {
     x = (double) i / N_UPDATES;
     if (x <= L/m) {

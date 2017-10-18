@@ -1,7 +1,7 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define N_UPDATES 1000
+#define N_UPDATES 200
 
 // can still make subclasses
 namespace asymmetry {
