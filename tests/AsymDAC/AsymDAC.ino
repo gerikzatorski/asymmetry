@@ -21,7 +21,7 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init(2);
+  wave.init(3);
   wave.compute();
   
   Serial.begin(115200);
@@ -65,7 +65,7 @@ void loop() {
   /* Serial.print("\t"); */
   Serial.println(debugCopy);
   
-  delay(5);
+  delay(4);
 }
 
 double waveKlatzky(double wavept) {

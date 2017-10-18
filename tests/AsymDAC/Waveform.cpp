@@ -208,19 +208,21 @@ ATrianglewave::~ATrianglewave(void) {
 
 void ATrianglewave::compute(void) {
   double x = 0;
-  double m = 5;
-  double L = _T;
+  double m = 4; // determines skew
+  double L = _T / 2;
   for (int i = 0; i < N_UPDATES; ++i) {
-    x = (double) i / N_UPDATES;
+    x = (double) i / N_UPDATES * _T;
     if (x <= L/m) {
       _updates[i] = m * x / L;
+      // _updates[i] = 1;
     } else if (x <= 2 * L - L/m) {
       _updates[i] = 1 - m / ((m-1) * L) * (x - L/m);
+      // _updates[i] = 2;
     } else {
       _updates[i] = m / L * (x - 2 * L);
+      // _updates[i] = 3;
     }
   }
 }
 
 } // namespace asymmetry
-
