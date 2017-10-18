@@ -1,4 +1,5 @@
 /**
+
    Class that represents a waveform pattern.
 
    @author Gerik Zatorski
@@ -7,8 +8,8 @@
 
 #include "Waveform.h"
 #include <math.h>
-// #include "matplotlibcpp.h"
-// #include <iostream>
+#include "matplotlibcpp.h"
+#include <iostream>
 
 #define PI 3.141592
 #define E 2.71828182845904523536
@@ -97,29 +98,29 @@ void Waveform::graph(void) {
 
 
 void Waveform::graphApprox(double f_int) {
-  // namespace plt = matplotlibcpp;
-  // using namespace std;
+  namespace plt = matplotlibcpp;
+  using namespace std;
 
-  // double T_int = 1.0 / f_int;
+  double T_int = 1.0 / f_int;
   
-  // double n = (double) _T / T_int;
-  // vector<double> x(n+1),y(n+1); 
+  double n = (double) _T / T_int;
+  vector<double> x(n+1),y(n+1); 
   
-  // int i = 0;
-  // double t = 0;
+  int i = 0;
+  double t = 0;
 
-  // while (t < _T) {
-  //   x.at(i) = i * T_int;
-  //   y.at(i) = approx(t);
-  //   i++;
-  //   t = i * T_int;
-  // }
+  while (t < _T) {
+    x.at(i) = i * T_int;
+    y.at(i) = approx(t);
+    i++;
+    t = i * T_int;
+  }
 
-  // x.at(n) = _T;
-  // y.at(n) = _updates[0];
+  x.at(n) = _T;
+  y.at(n) = _updates[0];
 
-  // plt::plot(x, y, "r-");
-  // plt::show();
+  plt::plot(x, y, "r-");
+  plt::show();
   
 }
 
@@ -184,7 +185,7 @@ void ASinewave::compute(void) {
   //   _updates[i] = 2 * pow(cos( x ),2) * pow(E,sin(2*x)) / 1.7866 - 1;
   // }
 
-  // // option 3 : bad skew
+  // option 3 : bad skew
   // double x = 0;
   // double K = 0.1;
   // for (int i = 0; i < N_UPDATES; ++i) {
@@ -194,4 +195,31 @@ void ASinewave::compute(void) {
 
 }
 
+// ######################################################################
+// # ATrianglewave Class
+// ######################################################################
+
+ATrianglewave::ATrianglewave(void) {
+}
+
+ATrianglewave::~ATrianglewave(void) {
+}
+
+void ATrianglewave::compute(void) {
+  double x = 0;
+  double m = 5;
+  double L = _T / 2;
+  for (int i = 0; i < N_UPDATES; ++i) {
+    x = (double) i / N_UPDATES;
+    if (x <= L/m) {
+      _updates[i] = m * x / L;
+    } else if (x <= 2 * L - L/m) {
+      _updates[i] = 1 - m / ((m-1) * L) * (x - L/m);
+    } else {
+      _updates[i] = m / L * (x - 2 * L);
+    }
+  }
+}
+
 } // namespace asymmetry
+

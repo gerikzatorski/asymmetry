@@ -1,7 +1,7 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define N_UPDATES 50
+#define N_UPDATES 1000
 
 // can still make subclasses
 namespace asymmetry {
@@ -71,6 +71,15 @@ namespace asymmetry {
     ~ASinewave(void);
     void compute(void);
   };
+
+  class ATrianglewave : public Waveform
+  {
+  public:
+    ATrianglewave(void);
+    ~ATrianglewave(void);
+    void compute(void);
+  };
+
 }
 
 #endif // _WAVEFORM_H

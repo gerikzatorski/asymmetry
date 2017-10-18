@@ -13,7 +13,7 @@ volatile double debug;
 
 // Objects
 IntervalTimer myTimer; // init Teensy timer
-asymmetry::ASinewave wave;
+asymmetry::ATrianglewave wave;
 
 void setup() {
   analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
@@ -21,7 +21,7 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init(1);
+  wave.init(5);
   wave.compute();
   
   Serial.begin(115200);
