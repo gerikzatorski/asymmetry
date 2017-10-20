@@ -21,7 +21,7 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init(1);
+  wave.init(20);
   wave.compute();
   
   Serial.begin(115200);
@@ -33,17 +33,31 @@ void setup() {
 // play value on analog out pin
 void play_level(void) { 
 
+  // toggle wave skew value
+  if (step >= INT_FREQ * 2) {
+    if (wave.getSkew() == 2.0) {
+      wave.setSkew(8.0);
+      wave.compute();
+      debug = 8.0;
+    } else {
+      wave.setSkew(2.0);
+      wave.compute();
+      debug = 2.0;
+    }
+    step = 0;
+  }
+  
   if (time >= wave.getPeriod()) {
     time = time - wave.getPeriod();
   }
 
   double val = wave.approx(time) * 2000 + 2000; // help with dc offset
-  /* double val = wave.approx(time); */
   analogWrite(outPin, val);
 
   debug = val;
-
+  
   time = time + interrupt_callback_time;
+  step++;
 }
 
 void loop() {
@@ -66,15 +80,4 @@ void loop() {
   Serial.println(debugCopy);
   
   delay(4);
-}
-
-double waveKlatzky(double wavept) {
-  long delta = -0.5;
-  double omega1 = PI + PI/2 * delta;
-
-  if (wavept < omega1) return -cos(wavept * PI/omega1);
-  else {
-    double omega2 = PI - PI/2 * (1 - delta);
-    return -cos(wavept * PI/omega2);
-  }
 }

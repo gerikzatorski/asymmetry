@@ -78,6 +78,10 @@ namespace asymmetry {
     ATrianglewave(void);
     ~ATrianglewave(void);
     void compute(void);
+    double getSkew(void);
+    void setSkew(double m);
+  private:
+    double _m;
   };
 
 }

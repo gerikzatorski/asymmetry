@@ -171,28 +171,21 @@ ASinewave::~ASinewave(void) {
 }
 
 void ASinewave::compute(void) {
-
+  
   // option 1:
-  double x = 0;
-  for (int i = 0; i < N_UPDATES; ++i) {
-    x = (double) i / N_UPDATES * 2 * PI;
-    _updates[i] = cos( x + pow( sin( x / 2 ), 2) );
-  }
-
-  // option 2
   // double x = 0;
-  // for (int i = 0; i < N_UPDATES; ++i) {
-  //   x = (double) i / N_UPDATES * PI;
-  //   _updates[i] = 2 * pow(cos( x ),2) * pow(E,sin(2*x)) / 1.7866 - 1;
-  // }
-
-  // option 3 : bad skew
-  // double x = 0;
-  // double K = 0.1;
   // for (int i = 0; i < N_UPDATES; ++i) {
   //   x = (double) i / N_UPDATES * 2 * PI;
-  //   _updates[i] = sin( x + K * sin(x));
+  //   _updates[i] = cos( x + pow( sin( x / 2 ), 2) );
   // }
+
+  // option 2 : simple skew
+  double x = 0;
+  double K = 0.4;
+  for (int i = 0; i < N_UPDATES; ++i) {
+    x = (double) i / N_UPDATES * 2 * PI;
+    _updates[i] = sin( x + K * sin(x));
+  }
 
 }
 
@@ -201,6 +194,7 @@ void ASinewave::compute(void) {
 // ######################################################################
 
 ATrianglewave::ATrianglewave(void) {
+  _m = 2.0; // no skew
 }
 
 ATrianglewave::~ATrianglewave(void) {
@@ -208,7 +202,7 @@ ATrianglewave::~ATrianglewave(void) {
 
 void ATrianglewave::compute(void) {
   double x = 0;
-  double m = 4; // determines skew
+  double m = _m; // determines skew
   double L = _T / 2;
   for (int i = 0; i < N_UPDATES; ++i) {
     x = (double) i / N_UPDATES * _T;
@@ -223,6 +217,14 @@ void ATrianglewave::compute(void) {
       // _updates[i] = 3;
     }
   }
+}
+
+double ATrianglewave::getSkew(void) {
+  return _m;
+}
+
+void ATrianglewave::setSkew(double m) {
+  _m = m;
 }
 
 } // namespace asymmetry
