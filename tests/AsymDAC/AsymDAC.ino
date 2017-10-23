@@ -7,13 +7,14 @@
 double interrupt_callback_time = (double) (1.0 / INT_FREQ);
 
 // use volatile for shared variables
-volatile unsigned int step = 0; // increment on interrupts
-volatile double time = 0; // increment on interrupts
+volatile unsigned int step = 0;
+volatile double time = 0;
 volatile double debug;
 
-// Objects
 IntervalTimer myTimer; // init Teensy timer
-asymmetry::ATrianglewave wave;
+asymmetry::ATrianglewave wave1;
+asymmetry::ATrianglewave wave2;
+asymmetry::ATrianglewave *pwave;
 
 void setup() {
   analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
@@ -21,8 +22,17 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave.init(20);
-  wave.compute();
+  wave1.init(40);
+  wave2.init(40);
+
+  wave1.setSkew(8.0);
+  wave2.setSkew(2.0);
+  
+  wave1.compute();
+  wave2.compute();
+
+  // start with wave1
+  pwave = &wave1;
   
   Serial.begin(115200);
   Serial.println("serial on");
@@ -33,28 +43,26 @@ void setup() {
 // play value on analog out pin
 void play_level(void) { 
 
-  // toggle wave skew value
+  // toggle waves
   if (step >= INT_FREQ * 2) {
-    if (wave.getSkew() == 2.0) {
-      wave.setSkew(8.0);
-      wave.compute();
-      debug = 8.0;
+    if (pwave == &wave1) {
+      pwave = &wave2;
+      debug = 1;
     } else {
-      wave.setSkew(2.0);
-      wave.compute();
-      debug = 2.0;
+      pwave = &wave1;
+      debug = 2;
     }
     step = 0;
   }
   
-  if (time >= wave.getPeriod()) {
-    time = time - wave.getPeriod();
+  if (time >= pwave->getPeriod()) {
+    time = time - wave1.getPeriod();
   }
 
-  double val = wave.approx(time) * 2000 + 2000; // help with dc offset
+  double val = pwave->approx(time) * 2000 + 2000; // help with dc offset
   analogWrite(outPin, val);
 
-  debug = val;
+  /* debug = val; */
   
   time = time + interrupt_callback_time;
   step++;
