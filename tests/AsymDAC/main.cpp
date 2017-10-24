@@ -1,18 +1,25 @@
-// #include "Waveform.h"
-// #include <iostream>
+#include "Waveform.h"
+#include <iostream>
 
-// using namespace std;
+using namespace std;
 
-// int main() 
-// {
-//   asymmetry::ATrianglewave wave;
-//   wave.init(3);
-//   wave.compute();
+int main() 
+{
+  double a[5] = {0,1,2,3,4};
+  double b[5] = {0,2,4,6,8};
 
-//   cout << wave.approx(0.5) << endl;
-//   // cout << wave.approx(1.9) << endl;
+  double *pa = a;
+  double *pb = b;
+
+  // asymmetry::Waveform wave(5, a[], b[]);
+  asymmetry::Waveform wave(5, pa, pb);
+
+  wave.compute();
+
+  // cout << wave.approx(0.5) << endl;
+  // cout << wave.approx(1.9) << endl;
+
+  wave.graph();
   
-//   wave.graphApprox(100);
-  
-//   return 0;
-// } 
+  return 0;
+} 

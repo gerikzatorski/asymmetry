@@ -13,8 +13,8 @@ volatile double debug;
 
 IntervalTimer myTimer; // init Teensy timer
 
-asymmetry::TriangleWave wave1;
-asymmetry::TriangleWave wave2;
+asymmetry::TriangleWave wave1(40);
+asymmetry::TriangleWave wave2(40);
 asymmetry::TriangleWave *pwave;
 
 /* asymmetry::SineWave wave1; */
@@ -26,9 +26,6 @@ void setup() {
 
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
-
-  wave1.init(40);
-  wave2.init(40);
 
   wave1.setSkew(8.0);
   wave2.setSkew(2.0);

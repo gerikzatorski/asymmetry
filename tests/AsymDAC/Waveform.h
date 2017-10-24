@@ -1,7 +1,9 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define N_UPDATES 100
+#define MAX_UPDATES 100 // sizes member arrays
+
+#include <vector>
 
 // can still make subclasses
 namespace asymmetry {
@@ -9,17 +11,20 @@ namespace asymmetry {
   class Waveform
   {
   public:
-    // Constructor
+    // Defaut Constructor
     Waveform(void);
     
-    // Initializes Waveform objects.
+    // Simple Constructor
     // @param f Wave frequency
-    void init(int f);
+    Waveform(int f);
 
+    // Custom Wave Constructor
+    Waveform(int size, double *t, double *u);
+    
     // Compute lookup tables for signal values and times
     void compute(void);
 
-    // @param i iteration within N_UPDATES
+    // @param i index value
     // @return The signal value at i
     double getUpdate(int i);
 
@@ -35,6 +40,7 @@ namespace asymmetry {
     void graphApprox(double f_int);
 
     // Getters
+    int getN(void);
     int getAmplitude(void);
     int getFrequency(void);
     double getPeriod(void);
@@ -44,6 +50,7 @@ namespace asymmetry {
     void setFrequency(int f);
     
   protected:
+    int _n;			// Number of updates
     int _pin;
     int _A;			// Amplitude
     int _f;			// Wave pattern frequency (Hz)
@@ -51,9 +58,8 @@ namespace asymmetry {
     double _phase_offset;	// phase offset (deg with 360 max)
 
     double _update_rate;	// sampling rate of signals
-    double _updates[N_UPDATES];	// for precalculating lookup table
-    double _times[N_UPDATES];   // array of times corresponding to update values
-
+    double _updates[MAX_UPDATES];	// for precalculating lookup table
+    double _times[MAX_UPDATES];   // array of times corresponding to update values
   };
 
   class SineWave : public Waveform
