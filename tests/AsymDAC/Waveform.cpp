@@ -142,36 +142,19 @@ void Waveform::setFrequency(int f) {
 
 
 // ######################################################################
-// # Sinewave Class
+// # SineWave Class
 // ######################################################################
 
 /** Constructor */
-Sinewave::Sinewave(void) {
+SineWave::SineWave(void) {
+  _K = 0.0; // no skew
 }
 
 /** Destructor */
-Sinewave::~Sinewave(void) {
+SineWave::~SineWave(void) {
 }
 
-void Sinewave::compute(void) {
-  using namespace std;
-  for (int i = 0; i < N_UPDATES; i++) {
-    _updates[i] = (double) 1 * sin( 2 * PI * _f * i * _update_rate + 0 );
-  }
-}
-
-// ######################################################################
-// # ASinewave Class
-// ######################################################################
-
-ASinewave::ASinewave(void) {
-}
-
-ASinewave::~ASinewave(void) {
-}
-
-void ASinewave::compute(void) {
-  
+void SineWave::compute(void) {
   // option 1:
   // double x = 0;
   // for (int i = 0; i < N_UPDATES; ++i) {
@@ -181,26 +164,32 @@ void ASinewave::compute(void) {
 
   // option 2 : simple skew
   double x = 0;
-  double K = 0.4;
   for (int i = 0; i < N_UPDATES; ++i) {
     x = (double) i / N_UPDATES * 2 * PI;
-    _updates[i] = sin( x + K * sin(x));
+    _updates[i] = sin( x + _K * sin(x));
   }
+}
 
+double SineWave::getSkew(void) {
+  return _K;
+}
+
+void SineWave::setSkew(double K) {
+  _K = K;
 }
 
 // ######################################################################
 // # ATrianglewave Class
 // ######################################################################
 
-ATrianglewave::ATrianglewave(void) {
+TriangleWave::TriangleWave(void) {
   _m = 2.0; // no skew
 }
 
-ATrianglewave::~ATrianglewave(void) {
+TriangleWave::~TriangleWave(void) {
 }
 
-void ATrianglewave::compute(void) {
+void TriangleWave::compute(void) {
   double x = 0;
   double m = _m; // determines skew
   double L = _T / 2;
@@ -208,22 +197,19 @@ void ATrianglewave::compute(void) {
     x = (double) i / N_UPDATES * _T;
     if (x <= L/m) {
       _updates[i] = m * x / L;
-      // _updates[i] = 1;
     } else if (x <= 2 * L - L/m) {
       _updates[i] = 1 - m / ((m-1) * L) * (x - L/m);
-      // _updates[i] = 2;
     } else {
       _updates[i] = m / L * (x - 2 * L);
-      // _updates[i] = 3;
     }
   }
 }
 
-double ATrianglewave::getSkew(void) {
+double TriangleWave::getSkew(void) {
   return _m;
 }
 
-void ATrianglewave::setSkew(double m) {
+void TriangleWave::setSkew(double m) {
   _m = m;
 }
 

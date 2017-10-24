@@ -56,27 +56,23 @@ namespace asymmetry {
 
   };
 
-  class Sinewave : public Waveform
+  class SineWave : public Waveform
   {
   public:
-    Sinewave(void);
-    ~Sinewave(void);
+    SineWave(void);
+    ~SineWave(void);
     void compute(void);
+    double getSkew(void);
+    void setSkew(double K);
+  private:
+    double _K; // skew factor
   };
 
-  class ASinewave : public Waveform
+  class TriangleWave : public Waveform
   {
   public:
-    ASinewave(void);
-    ~ASinewave(void);
-    void compute(void);
-  };
-
-  class ATrianglewave : public Waveform
-  {
-  public:
-    ATrianglewave(void);
-    ~ATrianglewave(void);
+    TriangleWave(void);
+    ~TriangleWave(void);
     void compute(void);
     double getSkew(void);
     void setSkew(double m);

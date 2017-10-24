@@ -12,9 +12,14 @@ volatile double time = 0;
 volatile double debug;
 
 IntervalTimer myTimer; // init Teensy timer
-asymmetry::ATrianglewave wave1;
-asymmetry::ATrianglewave wave2;
-asymmetry::ATrianglewave *pwave;
+
+asymmetry::TriangleWave wave1;
+asymmetry::TriangleWave wave2;
+asymmetry::TriangleWave *pwave;
+
+/* asymmetry::SineWave wave1; */
+/* asymmetry::SineWave wave2; */
+/* asymmetry::SineWave *pwave; */
 
 void setup() {
   analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
@@ -56,7 +61,7 @@ void play_level(void) {
   }
   
   if (time >= pwave->getPeriod()) {
-    time = time - wave1.getPeriod();
+    time = time - pwave->getPeriod();
   }
 
   double val = pwave->approx(time) * 2000 + 2000; // help with dc offset
