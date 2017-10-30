@@ -1,7 +1,7 @@
 #ifndef _WAVEFORM_H
 #define _WAVEFORM_H
 
-#define MAX_UPDATES 100 // sizes member arrays
+#define MAX_UPDATES 1000 // sizes member arrays
 
 #include <vector>
 
@@ -57,8 +57,8 @@ namespace asymmetry {
     double _T;			// period (s)
     double _phase_offset;	// phase offset (deg with 360 max)
 
-    double _update_rate;	// sampling rate of signals
-    double _updates[MAX_UPDATES];	// for precalculating lookup table
+    double _update_rate;	  // sampling rate of signals
+    double _updates[MAX_UPDATES]; // for precalculating lookup table
     double _times[MAX_UPDATES];   // array of times corresponding to update values
   };
 
@@ -78,6 +78,7 @@ namespace asymmetry {
   {
   public:
     TriangleWave(void);
+    TriangleWave(int f);
     ~TriangleWave(void);
     void compute(void);
     double getSkew(void);

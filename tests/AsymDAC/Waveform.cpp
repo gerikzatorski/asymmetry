@@ -8,8 +8,8 @@
 
 #include "Waveform.h"
 #include <math.h>
-#include "matplotlibcpp.h"
-#include <iostream>
+// #include "matplotlibcpp.h"
+// #include <iostream>
 
 #define PI 3.141592
 #define E 2.71828182845904523536
@@ -23,6 +23,7 @@ namespace asymmetry {
 // ######################################################################
 
 Waveform::Waveform(void) {
+  
 }
 
 Waveform::Waveform(int f) {
@@ -47,9 +48,8 @@ Waveform::Waveform(int size, double *t, double *u) {
   }
 }
 
-void Waveform::compute(void) {
-  // handled by sub classes (TODO: virtual void?)
-}
+// TODO: I should do better
+void Waveform::compute(void) {}
  
 double Waveform::getUpdate(int i) {
   return _updates[i];
@@ -85,49 +85,49 @@ double Waveform::approx(double t) {
 }
 
 void Waveform::graph(void) {
-  namespace plt = matplotlibcpp;
-  using namespace std;
+  // namespace plt = matplotlibcpp;
+  // using namespace std;
 
-  double n = (double)_n;
-  vector<double> x(n+1),y(n+1); 
+  // double n = (double)_n;
+  // vector<double> x(n+1),y(n+1); 
 
-  for(int i=0; i<n; ++i) {
-    double t = i/n;
-    x.at(i) = _times[i];
-    y.at(i) = _updates[i];
-  }
+  // for(int i=0; i<n; ++i) {
+  //   double t = i/n;
+  //   x.at(i) = _times[i];
+  //   y.at(i) = _updates[i];
+  // }
 
-  x.at(_n) = _T;
-  y.at(_n) = _updates[0];
+  // x.at(_n) = _T;
+  // y.at(_n) = _updates[0];
     
-  plt::plot(x, y, "r-");
-  plt::show(); 
+  // plt::plot(x, y, "r-");
+  // plt::show(); 
 }
 
 void Waveform::graphApprox(double f_int) {
-  namespace plt = matplotlibcpp;
-  using namespace std;
+  // namespace plt = matplotlibcpp;
+  // using namespace std;
 
-  double T_int = 1.0 / f_int;
+  // double T_int = 1.0 / f_int;
   
-  double n = (double) _T / T_int;
-  vector<double> x(n+1),y(n+1); 
+  // double n = (double) _T / T_int;
+  // vector<double> x(n+1),y(n+1); 
   
-  int i = 0;
-  double t = 0;
+  // int i = 0;
+  // double t = 0;
 
-  while (t < _T) {
-    x.at(i) = i * T_int;
-    y.at(i) = approx(t);
-    i++;
-    t = i * T_int;
-  }
+  // while (t < _T) {
+  //   x.at(i) = i * T_int;
+  //   y.at(i) = approx(t);
+  //   i++;
+  //   t = i * T_int;
+  // }
 
-  x.at(n) = _T;
-  y.at(n) = _updates[0];
+  // x.at(n) = _T;
+  // y.at(n) = _updates[0];
 
-  plt::plot(x, y, "r-");
-  plt::show();
+  // plt::plot(x, y, "r-");
+  // plt::show();
 }
 
 // Getters
@@ -142,7 +142,7 @@ void Waveform::setFrequency(int f) {
     _times[i] = _times[i] * f / _f;
   }
   _f = f;
-  _T = 1.0 / _f;
+  _T = 1.0 / f;
   _update_rate = (double) _T / _n;
 }
 
@@ -190,6 +190,20 @@ void SineWave::setSkew(double K) {
 
 TriangleWave::TriangleWave(void) {
   _m = 2.0; // no skew
+}
+
+TriangleWave::TriangleWave(int f) {
+  _n = MAX_UPDATES;
+  _A = 1;
+  _f = f;
+  _T = 1.0 / _f;
+  _phase_offset = 0.0;
+  _update_rate = (double) _T / _n;
+
+  for (int i = 0; i < _n; ++i) {
+    _times[i] = (double) i * _update_rate;
+  }
+
 }
 
 TriangleWave::~TriangleWave(void) {

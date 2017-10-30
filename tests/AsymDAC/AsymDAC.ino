@@ -3,8 +3,11 @@
 #define ledPin 13
 #define outPin A21		// DAC pins are A21 and A22
 #define INT_FREQ 1000
+#define potPin A13
 
+int potVal = 0;
 double interrupt_callback_time = (double) (1.0 / INT_FREQ);
+double wave_frequency = 1;
 
 // use volatile for shared variables
 volatile unsigned int step = 0;
@@ -13,8 +16,8 @@ volatile double debug;
 
 IntervalTimer myTimer; // init Teensy timer
 
-asymmetry::TriangleWave wave1(40);
-asymmetry::TriangleWave wave2(40);
+asymmetry::TriangleWave wave1(wave_frequency);
+asymmetry::TriangleWave wave2(wave_frequency);
 asymmetry::TriangleWave *pwave;
 
 /* asymmetry::SineWave wave1; */
@@ -71,9 +74,13 @@ void play_level(void) {
 }
 
 void loop() {
-
   double debugCopy;
   double timeCopy;
+
+  potVal = analogRead(potPin) + 1;
+  double newF = potVal / 1024.0 * 100;
+  wave1.setFrequency(newF);
+  wave2.setFrequency(newF);
 
   // to read a variable which the interrupt code writes, we
   // must temporarily disable interrupts, to be sure it will
@@ -82,12 +89,13 @@ void loop() {
   // use the copy while allowing the interrupt to keep working.
   noInterrupts();
   debugCopy = debug;
-  timeCopy = time;
+  /* timeCopy = time; */
   interrupts();
 
   /* Serial.print(timeCopy); */
   /* Serial.print("\t"); */
   Serial.println(debugCopy);
-  
+  /* Serial.println(newF); */
+
   delay(4);
 }
