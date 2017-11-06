@@ -20,8 +20,8 @@ asymmetry::TriangleWave wave1(wave_frequency);
 asymmetry::TriangleWave wave2(wave_frequency);
 asymmetry::TriangleWave *pwave;
 
-/* asymmetry::SineWave wave1; */
-/* asymmetry::SineWave wave2; */
+/* asymmetry::SineWave wave1(wave_frequency); */
+/* asymmetry::SineWave wave2(wave_frequency); */
 /* asymmetry::SineWave *pwave; */
 
 void setup() {

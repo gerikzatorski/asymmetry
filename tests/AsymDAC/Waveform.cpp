@@ -22,16 +22,12 @@ namespace asymmetry {
 // # Waveform Class
 // ######################################################################
 
-Waveform::Waveform(void) {
-  
-}
-
-Waveform::Waveform(int f) {
-  _n = MAX_UPDATES;
-  _A = 1;
-  _f = f;
+Waveform::Waveform(int f)
+  : _n(MAX_UPDATES),
+    _A(1),
+    _f(f)
+{
   _T = 1.0 / _f;
-  _phase_offset = 0.0;
   _update_rate = (double) _T / _n;
 
   for (int i = 0; i < _n; ++i) {
@@ -48,15 +44,11 @@ Waveform::Waveform(int size, double *t, double *u) {
   }
 }
 
-// TODO: I should do better
-void Waveform::compute(void) {}
- 
 double Waveform::getUpdate(int i) {
   return _updates[i];
 }
 
 double Waveform::approx(double t) {
-
   double dt = t;
 
   // ensure dt is within waveform domain
@@ -74,13 +66,10 @@ double Waveform::approx(double t) {
 
   int i0 = i-1;
   int i1 = i;
-
-
   if (i >= _n) {
     i0 = i-1;
     i1 = 0;
   }
-
   return _updates[i0] + (dt - _times[i0]) * (_updates[i1] - _updates[i0]) / _update_rate;
 }
 
@@ -135,7 +124,6 @@ int Waveform::getN(void) {return _n; }
 int Waveform::getAmplitude(void) { return _A; }
 int Waveform::getFrequency(void) { return _f; }
 double Waveform::getPeriod(void) { return _T; }
-double Waveform::getOffset(void) { return _phase_offset; }
 
 void Waveform::setFrequency(int f) {
   for (int i = 0; i < _n; ++i) {
@@ -146,18 +134,21 @@ void Waveform::setFrequency(int f) {
   _update_rate = (double) _T / _n;
 }
 
+void Waveform::rms(void) {
+  // double tot = 0;
+  // for (int i = 0; i < _n; ++i) {
+  //   tot += _updates[i] * _updates[i];
+  // }
+  // return sqrt(tot/_n);
+}
 
 // ######################################################################
 // # SineWave Class
 // ######################################################################
 
 /** Constructor */
-SineWave::SineWave(void) {
-  _K = 0.0; // no skew
-}
-
-/** Destructor */
-SineWave::~SineWave(void) {
+SineWave::SineWave(int f) : Waveform(f) {
+  // _K = 0.0; // no skew
 }
 
 void SineWave::compute(void) {
@@ -188,39 +179,22 @@ void SineWave::setSkew(double K) {
 // # TriangleWave Class
 // ######################################################################
 
-TriangleWave::TriangleWave(void) {
-  _m = 2.0; // no skew
-}
-
-TriangleWave::TriangleWave(int f) {
-  _n = MAX_UPDATES;
-  _A = 1;
-  _f = f;
-  _T = 1.0 / _f;
-  _phase_offset = 0.0;
-  _update_rate = (double) _T / _n;
-
-  for (int i = 0; i < _n; ++i) {
-    _times[i] = (double) i * _update_rate;
-  }
-
-}
-
-TriangleWave::~TriangleWave(void) {
+/** Constructor */
+TriangleWave::TriangleWave(int f) : Waveform(f) {
+  // _m = 2.0; // no skew
 }
 
 void TriangleWave::compute(void) {
   double x = 0;
-  double m = _m; // determines skew
   double L = _T / 2;
   for (int i = 0; i < _n; ++i) {
     x = (double) i / _n * _T;
-    if (x <= L/m) {
-      _updates[i] = m * x / L;
-    } else if (x <= 2 * L - L/m) {
-      _updates[i] = 1 - m / ((m-1) * L) * (x - L/m);
+    if (x <= L/_m) {
+      _updates[i] = _m * x / L;
+    } else if (x <= 2 * L - L/_m) {
+      _updates[i] = 1 - _m / ((_m-1) * L) * (x - L/_m);
     } else {
-      _updates[i] = m / L * (x - 2 * L);
+      _updates[i] = _m / L * (x - 2 * L);
     }
   }
 }
