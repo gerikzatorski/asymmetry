@@ -8,8 +8,6 @@
 
 #include "Waveform.h"
 #include <math.h>
-// #include "matplotlibcpp.h"
-// #include <iostream>
 
 #define PI 3.141592
 #define E 2.71828182845904523536
@@ -48,9 +46,13 @@ double Waveform::getUpdate(int i) {
   return _updates[i];
 }
 
+double Waveform::getTime(int i) {
+  return _times[i];
+}
+
 double Waveform::approx(double t) {
   double dt = t;
-
+  
   // ensure dt is within waveform domain
   if (t >= _T) {
     double ttot = t / _T;
@@ -73,52 +75,6 @@ double Waveform::approx(double t) {
   return _updates[i0] + (dt - _times[i0]) * (_updates[i1] - _updates[i0]) / _update_rate;
 }
 
-void Waveform::graph(void) {
-  // namespace plt = matplotlibcpp;
-  // using namespace std;
-
-  // double n = (double)_n;
-  // vector<double> x(n+1),y(n+1); 
-
-  // for(int i=0; i<n; ++i) {
-  //   double t = i/n;
-  //   x.at(i) = _times[i];
-  //   y.at(i) = _updates[i];
-  // }
-
-  // x.at(_n) = _T;
-  // y.at(_n) = _updates[0];
-    
-  // plt::plot(x, y, "r-");
-  // plt::show(); 
-}
-
-void Waveform::graphApprox(double f_int) {
-  // namespace plt = matplotlibcpp;
-  // using namespace std;
-
-  // double T_int = 1.0 / f_int;
-  
-  // double n = (double) _T / T_int;
-  // vector<double> x(n+1),y(n+1); 
-  
-  // int i = 0;
-  // double t = 0;
-
-  // while (t < _T) {
-  //   x.at(i) = i * T_int;
-  //   y.at(i) = approx(t);
-  //   i++;
-  //   t = i * T_int;
-  // }
-
-  // x.at(n) = _T;
-  // y.at(n) = _updates[0];
-
-  // plt::plot(x, y, "r-");
-  // plt::show();
-}
-
 // Getters
 int Waveform::getN(void) {return _n; }
 int Waveform::getAmplitude(void) { return _A; }
@@ -132,14 +88,6 @@ void Waveform::setFrequency(int f) {
   _f = f;
   _T = 1.0 / f;
   _update_rate = (double) _T / _n;
-}
-
-void Waveform::rms(void) {
-  // double tot = 0;
-  // for (int i = 0; i < _n; ++i) {
-  //   tot += _updates[i] * _updates[i];
-  // }
-  // return sqrt(tot/_n);
 }
 
 // ######################################################################
@@ -160,19 +108,33 @@ void SineWave::compute(void) {
   // }
 
   // option 2 : simple skew
-  double x = 0;
+  // double x = 0;
+  // for (int i = 0; i < _n; ++i) {
+  //   x = (double) i / _n * 2 * PI;
+  //   _updates[i] = sin( x + _K * sin(x));
+  // }
+
+  // option 3: Piecewise stitching
+  double omega1 = _omega1;
+  double omega2 = 1 - omega1;
   for (int i = 0; i < _n; ++i) {
-    x = (double) i / _n * 2 * PI;
-    _updates[i] = sin( x + _K * sin(x));
+    double x = (double) i / _n * _T;
+    if (x <= omega1/2) {
+      _updates[i] = sin(x * PI/omega1);
+    } else if (x <= omega2 + omega1/2) {
+      _updates[i] = sin(x * PI/omega2 + PI/2 * (1 - omega1/omega2));
+    } else {
+      _updates[i] = sin(x * PI/omega1 + PI * (1 - omega2/omega1));
+    }
   }
 }
 
 double SineWave::getSkew(void) {
-  return _K;
+  return _omega1;
 }
 
-void SineWave::setSkew(double K) {
-  _K = K;
+void SineWave::setSkew(double omega1) {
+  _omega1 = omega1;
 }
 
 // ######################################################################

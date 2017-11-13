@@ -7,7 +7,7 @@
 
 int potVal = 0;
 double interrupt_callback_time = (double) (1.0 / INT_FREQ);
-double wave_frequency = 1;
+double wave_frequency = 40;
 
 // use volatile for shared variables
 volatile unsigned int step = 0;
@@ -16,13 +16,13 @@ volatile double debug;
 
 IntervalTimer myTimer; // init Teensy timer
 
-asymmetry::TriangleWave wave1(wave_frequency);
-asymmetry::TriangleWave wave2(wave_frequency);
-asymmetry::TriangleWave *pwave;
+/* asymmetry::TriangleWave wave1(wave_frequency); */
+/* asymmetry::TriangleWave wave2(wave_frequency); */
+/* asymmetry::TriangleWave *pwave; */
 
-/* asymmetry::SineWave wave1(wave_frequency); */
-/* asymmetry::SineWave wave2(wave_frequency); */
-/* asymmetry::SineWave *pwave; */
+asymmetry::SineWave wave1(wave_frequency);
+asymmetry::SineWave wave2(wave_frequency);
+asymmetry::SineWave *pwave;
 
 void setup() {
   analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
@@ -30,9 +30,12 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(outPin, OUTPUT);
 
-  wave1.setSkew(8.0);
-  wave2.setSkew(2.0);
-  
+  /* wave1.setSkew(2.0); */
+  /* wave2.setSkew(8.0); */
+
+  wave1.setSkew(0.5);
+  wave2.setSkew(0.9);
+
   wave1.compute();
   wave2.compute();
 
@@ -48,7 +51,7 @@ void setup() {
 // play value on analog out pin
 void play_level(void) { 
 
-  // toggle waves
+  /* toggle waves */
   if (step >= INT_FREQ * 2) {
     if (pwave == &wave1) {
       pwave = &wave2;
@@ -77,10 +80,10 @@ void loop() {
   double debugCopy;
   double timeCopy;
 
-  potVal = analogRead(potPin) + 1;
-  double newF = potVal / 1024.0 * 100;
-  wave1.setFrequency(newF);
-  wave2.setFrequency(newF);
+  /* potVal = analogRead(potPin) + 1; */
+  /* double newF = potVal / 1024.0 * 100; */
+  /* wave1.setFrequency(newF); */
+  /* wave2.setFrequency(newF); */
 
   // to read a variable which the interrupt code writes, we
   // must temporarily disable interrupts, to be sure it will

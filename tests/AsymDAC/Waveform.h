@@ -20,17 +20,15 @@ namespace asymmetry {
     // @return The signal value at i
     double getUpdate(int i);
 
+    // @param i index value
+    // @return The time at i
+    double getTime(int i);
+
     // Linear interpolate the waveform value using precomputed tables
     // @param t The time to evaluate waveform at
     // @return The approximate wave value at time t
     double approx(double t);
     
-    // Graphs a single Waveform using exact lookup table values
-    void graph(void);
-
-    // Graph a waveform with 
-    void graphApprox(double f_int);
-
     // Getters
     int getN(void);
     int getAmplitude(void);
@@ -54,22 +52,18 @@ namespace asymmetry {
   class SineWave : public Waveform
   {
   public:
-    /** Constructor */
     SineWave(int f);
-    /** Compute lookup tables for signal values and times */
     void compute(void);
     double getSkew(void);
-    void setSkew(double K);
+    void setSkew(double omega1);
   private:
-    double _K; // skew factor
+    double _omega1; // skew factor
   };
 
   class TriangleWave : public Waveform
   {
   public:
-    /** Constructor */
     TriangleWave(int f);
-    /** Compute lookup tables for signal values and times */
     void compute(void);
     double getSkew(void);
     void setSkew(double m);
