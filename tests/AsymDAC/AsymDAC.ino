@@ -34,8 +34,8 @@ void setup() {
   /* wave2.setSkew(8.0); */
 
   wave1.setSkew(0.5);
-  wave2.setSkew(0.9);
-
+  wave2.setSkew(0.8);
+  
   wave1.compute();
   wave2.compute();
 

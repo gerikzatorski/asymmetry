@@ -12,8 +12,6 @@
 #define PI 3.141592
 #define E 2.71828182845904523536
 
-using namespace std;
-
 namespace asymmetry {
 
 // ######################################################################
@@ -52,7 +50,7 @@ double Waveform::getTime(int i) {
 
 double Waveform::approx(double t) {
   double dt = t;
-  
+
   // ensure dt is within waveform domain
   if (t >= _T) {
     double ttot = t / _T;
@@ -95,30 +93,16 @@ void Waveform::setFrequency(int f) {
 // ######################################################################
 
 /** Constructor */
-SineWave::SineWave(int f) : Waveform(f) {
-  // _K = 0.0; // no skew
+SineWave::SineWave(int f)
+  : Waveform(f) {
+  // _omega1 = 0.5; // no skew
 }
 
 void SineWave::compute(void) {
-  // option 1:
-  // double x = 0;
-  // for (int i = 0; i < _n; ++i) {
-  //   x = (double) i / _n * 2 * PI;
-  //   _updates[i] = cos( x + pow( sin( x / 2 ), 2) );
-  // }
-
-  // option 2 : simple skew
-  // double x = 0;
-  // for (int i = 0; i < _n; ++i) {
-  //   x = (double) i / _n * 2 * PI;
-  //   _updates[i] = sin( x + _K * sin(x));
-  // }
-
-  // option 3: Piecewise stitching
   double omega1 = _omega1;
   double omega2 = 1 - omega1;
   for (int i = 0; i < _n; ++i) {
-    double x = (double) i / _n * _T;
+    double x = (double) i / _n;
     if (x <= omega1/2) {
       _updates[i] = sin(x * PI/omega1);
     } else if (x <= omega2 + omega1/2) {
