@@ -55,10 +55,10 @@ void play_level(void) {
   if (step >= INT_FREQ * 2) {
     if (pwave == &wave1) {
       pwave = &wave2;
-      debug = 1;
+      debug = 2;
     } else {
       pwave = &wave1;
-      debug = 2;
+      debug = 1;
     }
     step = 0;
   }
@@ -70,8 +70,6 @@ void play_level(void) {
   double val = pwave->approx(time) * 2000 + 2000; // help with dc offset
   analogWrite(outPin, val);
 
-  /* debug = val; */
-  
   time = time + interrupt_callback_time;
   step++;
 }
@@ -97,8 +95,13 @@ void loop() {
 
   /* Serial.print(timeCopy); */
   /* Serial.print("\t"); */
-  Serial.println(debugCopy);
+
+  if (debugCopy == 1) {
+    Serial.println("Symmetry");
+  } else {
+    Serial.println("Asymmetric");
+  }
   /* Serial.println(newF); */
 
-  delay(4);
+  delay(10);
 }

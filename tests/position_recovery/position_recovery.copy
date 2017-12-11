@@ -1,0 +1,86 @@
+#include "Waveform.h"
+#include "Ultrasonic.h"
+#include "Filter.h"
+
+#define ledPin 13
+#define avdPin A21		// DAC pins are A21 and A22
+
+#define INT_FREQ 1000
+
+#define range_min 0
+#define range_max 100
+
+double wave_frequency = 40;
+double interrupt_callback_time = (double) (1.0 / INT_FREQ);
+
+volatile double wavetime = 0;
+volatile double debug;
+volatile unsigned int step = 0;
+volatile double k = 0.5;
+
+Ultrasonic ultrasonic;
+MedianFilter filter;
+IntervalTimer myTimer; // init Teensy timer
+
+asymmetry::SineWave waveform(wave_frequency);
+asymmetry::SineWave *pwave;
+
+void setup() {
+  analogWriteResolution(12); // 12bit = 4096 levels (max is 13 bit)
+
+  pinMode(avdPin, OUTPUT);
+  waveform.setSkew(k);
+  pwave = &waveform;
+
+  ultrasonic.pins(6,5);
+  
+  Serial.begin(9600);
+  myTimer.begin(play_level, (int)(interrupt_callback_time * 1000000));
+}
+
+// play value on analog out pin
+void play_level(void) { 
+  
+  if (wavetime >= pwave->getPeriod()) {
+    wavetime = wavetime - pwave->getPeriod();
+  }
+
+  double val = pwave->calculate(wavetime) * 2048 + 2048; // help with dc offset
+  analogWrite(avdPin, val);
+
+  debug = val;
+  wavetime = wavetime + interrupt_callback_time;
+  step++;
+}
+
+void loop() {
+  double debugCopy;
+  double wavetimeCopy;
+
+  
+  double raw_dist;
+  ultrasonic.DistanceMeasure();
+  raw_dist = ultrasonic.microsecondsToCentimeters();
+  
+  filter.add(raw_dist);
+  
+  // transfer variables from interrupts
+  /* noInterrupts(); */
+  /* debugCopy = debug; */
+  /* wavetimeCopy = wavetime; */
+  /* interrupts(); */
+  
+  double dist = filter.getAvg();
+  k = map(dist, range_min, range_max, 0.0, 1.0);
+  k = min(k, 1.0);
+  waveform.setSkew(k);
+
+  /** DEBUGGING **/
+  Serial.print(raw_dist);
+  Serial.print('\t');
+  Serial.print(dist);
+  Serial.print('\t');
+  Serial.println(k);
+  delay(4);
+}
+
